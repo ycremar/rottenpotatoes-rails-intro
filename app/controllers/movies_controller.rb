@@ -1,7 +1,17 @@
 class MoviesController < ApplicationController
   
+  def get_ratings
+    m = Movie.all.map { |x| x.rating }.uniq
+    m.sort
+    m
+    #['G','PG','PG-13','R']
+  end
+  
   def initialize
-    @all_ratings = ['G','PG','PG-13','R','NC-17']
+    puts "Initialize"
+    super
+    @all_ratings = get_ratings
+  end
   
   def clear
     session.clear
