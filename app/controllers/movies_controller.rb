@@ -25,46 +25,26 @@ class MoviesController < ApplicationController
   end
   
   def get_sort_state
+    @sort = session[:sort]
     if session[:sort].nil?
-      session[:sort] =  (params[:sort].nil?) ? :unsorted : params[:sort]
+      @sort =  (params[:sort].nil?) ? :unsorted : params[:sort]
     end
-    session[:sort]
+    @sort
   end
   
   def get_filter_state
+    @filter = session[:filter]
     if params[:commit] == 'Refresh'
-      session[:filter] = params[:ratings].keys unless params[:ratings].nil?
+      @filter = params[:ratings].keys unless params[:ratings].nil?
     end
-    session[:filter] = @all_ratings if session[:filter].nil?
-    session[:filter]
+    @filter = @all_ratings if @filter.nil?
+    @filter
   end
 
   def index
     
-    @sort = get_sort_state
-
-    if params[:commit] == 'Refresh' #filter
-      if params[:ratings] != nil
-        @filter = params[:ratings].keys
-      else
-        @filter = session[:filter]
-      end
-    else
-      if session[:filter] != nil
-        @filter = session[:filter]
-      end
-    end
-    
-    if @filter == nil
-      @filter = @all_ratings
-      puts "Default filter to all ratings"
-    end
-    
-    session[:filter] = @filter
-    session[:sort] = @sort
-
-    puts "Filter: #{@filter}"
-    puts "Sort by: #{@sort}"
+    session[:sort] = get_sort_state
+    session[:filter] = get_filter_state
 
     to_redirect = true if params[:sort] == nil or params[:filter] == nil
 
