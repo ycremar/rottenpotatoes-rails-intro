@@ -1,4 +1,12 @@
 class MoviesController < ApplicationController
+  def initialize
+    super
+    @all_ratings = get_ratings
+  end
+  
+  def get_ratings
+    ['G','PG','PG-13','R','NC-17'].map{|a| a}
+  end
   
   def movie_params
     params.require(:movie).permit(:title, :rating, :description, :release_date)
@@ -11,15 +19,16 @@ class MoviesController < ApplicationController
   end
   
   def index
-   @movies = Movie.all
+    @movies = params[:ratings].nil? ? Movie.all : Movie.where("rating IN (?)", params[:ratings].keys)
+    
     sort = params[:sort] || session[:sort]
     case sort
     when 'title'
-      ordering,@title_header = {:order => :title}, 'hilite'
-      @movies = Movie.order(:title)
+      ordering, @title_header = {:order => :title}, 'hilite'
+      @movies = @movies.order(:title)
     when 'release_date'
-      ordering,@date_header = {:order => :release_date}, 'hilite'
-      @movies = Movie.order(:release_date)
+      ordering, @date_header = {:order => :release_date}, 'hilite'
+      @movies = @movies.order(:release_date)
     end
   end
 
