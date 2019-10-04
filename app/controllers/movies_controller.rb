@@ -46,12 +46,9 @@ class MoviesController < ApplicationController
     session[:sort] = get_sort_state
     session[:filter] = get_filter_state
 
-    to_redirect = true if params[:sort] == nil or params[:filter] == nil
-
-    if to_redirect == true
-      puts "Redirecting with all params"
+    if params[:sort].nil? or params[:filter].nil?
       params[:ratings] = @filter
-      params[:sort]    = @sort
+      params[:sort] = @sort
       redirect_to movies_path(sort: @sort, filter: @filter)
       return
     end
