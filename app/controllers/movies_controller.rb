@@ -53,8 +53,11 @@ class MoviesController < ApplicationController
       return
     end
     
-    @movies = Movie.where("rating IN (?)", @filter)
-    @movies = @movies.order(@sort) unless @sort.nil? or @sort=='unsorted'
+    if @sort.nil? or @sort=='unsorted'
+      @movies = Movie.where("rating IN (?)", @filter)
+    else
+      @movies = Movie.where("rating IN (?)", @filter).order(@sort)
+    end
 
   end
 
