@@ -25,9 +25,9 @@ class MoviesController < ApplicationController
   end
   
   def get_sort_state
-    @sort = session[:sort]
-    if session[:sort].nil?
-      @sort =  (params[:sort].nil?) ? :unsorted : params[:sort]
+    @sort = params[:sort]
+    if params[:sort].nil?
+      @sort =  (session[:sort].nil?) ? :unsorted : session[:sort]
     end
     @sort
   end
