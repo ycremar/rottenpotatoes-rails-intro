@@ -1,49 +1,24 @@
 class MoviesController < ApplicationController
   
+  def get_ratings
+    m = Movie.all.map { |x| x.rating }.uniq
+    m.sort
+    m
+  end
+  
   def initialize
-    @all_ratings = ['G','PG','PG-13','R','NC-17'].map{|a| a}
+    puts "Initialize"
+    super
+    @all_ratings = get_ratings
+  end
+  
+  def movie_params
+    params.require(:movie).permit(:title, :rating, :description, :release_date)
   end
   
   def clear
     session.clear
-    redirect_to movie_path
-  end
-    
-  def get_sort_state
-    if session[:sort].nil?
-      session[:sort] =  (params[:sort].nil?) ? :unsorted : params[:sort]
-    end
-    session[:sort]
-  end
-  
-  def get_filter_state
-    if params[:commit] == 'Refresh'
-      session[:filter] = params[:ratings].keys unless params[:ratings].nil?
-    end
-    session[:filter] = @all_ratings if session[:filter].nil?
-    session[:filter]
-  end
-      
-  def index
-    @sort = get_sort_state
-    @filter = get_filter_state
-    
-    if params[:sort].nil? or params[:filter].nil?
-      params[:ratings] = @filter
-      params[:sort] = @sort
-      redirect_to movies_path(sort: @sort, filter: @filter)
-      return
-    end
-    
-    unless @sort.nil? or @sort=='unsorted'
-      @movies = Movie.where("rating IN (?)", @filter).order(@sort)
-    else
-      @movies = Movie.where("rating IN (?)", @filter)
-    end
-  end
-
-  def movie_params
-    params.require(:movie).permit(:title, :rating, :description, :release_date)
+    redirect_to movies_path  
   end
 
   def show
@@ -53,7 +28,62 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    puts "Params: #{params}"
+    puts "Session: #{session.keys}"
+    
+    
+    if params[:sort] != nil   #sort
+      puts "params sort"
+      @sort = params[:sort] 
+    else
+      if session[:sort] != nil
+        puts "session sort"
+        @sort = session[:sort]
+      else
+        @sort = :unsorted
+      end
+    end
+
+    if params[:commit] == 'Refresh' #filter
+      if params[:ratings] != nil
+        @filter = params[:ratings].keys
+      else
+        @filter = session[:filter]
+      end
+    else
+      if session[:filter] != nil
+        @filter = session[:filter]
+      end
+    end
+    
+    if @filter == nil
+      @filter = @all_ratings
+      puts "Default filter to all ratings"
+    end
+    
+    session[:filter] = @filter
+    session[:sort] = @sort
+
+    puts "Filter: #{@filter}"
+    puts "Sort by: #{@sort}"
+
+    to_redirect = true if params[:sort] == nil or params[:filter] == nil
+
+    if to_redirect == true
+      puts "Redirecting with all params"
+      params[:ratings] = @filter
+      params[:sort]    = @sort
+      redirect_to movies_path(sort: @sort, filter: @filter)
+      return
+    end
+    
+    if (@sort != nil) and (@sort != "unsorted")
+      @movies = Movie.where("rating IN (?)", @filter).order(@sort)
+    else
+      puts "Unsorted"
+      @movies = Movie.where("rating IN (?)", @filter)
+    end
+
   end
 
   def new
