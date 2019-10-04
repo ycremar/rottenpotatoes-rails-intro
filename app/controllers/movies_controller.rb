@@ -1,12 +1,8 @@
 class MoviesController < ApplicationController
-  
-  def get_ratings
-    ['G','PG','PG-13','R','NC-17'].map{|a| a}
-  end
-  
+
   def initialize
     super
-    @all_ratings = get_ratings
+    @all_ratings = ['G','PG','PG-13','R','NC-17'].map{|a| a}
   end
   
   def movie_params
