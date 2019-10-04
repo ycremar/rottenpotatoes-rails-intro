@@ -1,21 +1,13 @@
 class MoviesController < ApplicationController
   
-  def get_ratings
-    m = Movie.all.map { |x| x.rating }.uniq
-    m.sort
-    m
-    #['G','PG','PG-13','R']
-  end
-  
   def initialize
-    puts "Initialize"
-    super
-    @all_ratings = get_ratings
+    @all_ratings = ['G','PG','PG-13','R','NC-17'].map{|a| a}
   end
   
   def clear
     session.clear
     redirect_to movie_path
+  end
     
   def get_sort_state
     if session[:sort].nil?
@@ -30,6 +22,7 @@ class MoviesController < ApplicationController
     end
     session[:filter] = @all_ratings if session[:filter].nil?
     session[:filter]
+  end
       
   def index
     @sort = get_sort_state
@@ -46,6 +39,8 @@ class MoviesController < ApplicationController
       @movies = Movie.where("rating IN (?)", @filter).order(@sort)
     else
       @movies = Movie.where("rating IN (?)", @filter)
+    end
+  end
 
   def movie_params
     params.require(:movie).permit(:title, :rating, :description, :release_date)
@@ -88,6 +83,5 @@ class MoviesController < ApplicationController
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
   end
-
 
 end
