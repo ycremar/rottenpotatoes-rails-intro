@@ -1,17 +1,8 @@
 class MoviesController < ApplicationController
   
-  def get_ratings
-    m = Movie.all.map { |x| x.rating }.uniq
-    m.sort
-    m
-    #['G','PG','PG-13','R']
-  end
-  
   def initialize
-    puts "Initialize"
     super
-    @all_ratings = get_ratings
-  end
+    @all_ratings = ['G','PG','PG-13','R','NC-17'].map{|a| a}
   
   def movie_params
     params.require(:movie).permit(:title, :rating, :description, :release_date)
