@@ -1,8 +1,12 @@
 class MoviesController < ApplicationController
-
+  
   def initialize
     super
-    @all_ratings = ['G','PG','PG-13','R','NC-17'].map{|a| a}
+    @all_ratings = get_ratings
+  end
+  
+  def get_ratings
+    ['G','PG','PG-13','R','NC-17'].map{|a| a}
   end
   
   def movie_params
@@ -18,6 +22,21 @@ class MoviesController < ApplicationController
     id = params[:id] # retrieve movie ID from URI route
     @movie = Movie.find(id) # look up movie by unique ID
     # will render app/views/movies/show.<extension> by default
+  end
+  
+  def get_sort_state
+    if session[:sort].nil?
+      session[:sort] =  (params[:sort].nil?) ? :unsorted : params[:sort]
+    end
+    session[:sort]
+  end
+  
+  def get_filter_state
+    if params[:commit] == 'Refresh'
+      session[:filter] = params[:ratings].keys unless params[:ratings].nil?
+    end
+    session[:filter] = @all_ratings if session[:filter].nil?
+    session[:filter]
   end
 
   def index
