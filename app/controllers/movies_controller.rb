@@ -52,9 +52,10 @@ class MoviesController < ApplicationController
       redirect_to movies_path(sort: @sort, filter: @filter)
       return
     end
-  
+    
     @movies = Movie.where("rating IN (?)", @filter)
     @movies = @movies.order(@sort) unless @sort.nil? or @sort=='unsorted'
+    end
 
   end
 
