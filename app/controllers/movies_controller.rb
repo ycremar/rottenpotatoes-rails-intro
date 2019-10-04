@@ -40,21 +40,8 @@ class MoviesController < ApplicationController
   end
 
   def index
-    puts "Params: #{params}"
-    puts "Session: #{session.keys}"
     
-    
-    if params[:sort] != nil   #sort
-      puts "params sort"
-      @sort = params[:sort] 
-    else
-      if session[:sort] != nil
-        puts "session sort"
-        @sort = session[:sort]
-      else
-        @sort = :unsorted
-      end
-    end
+    @sort = get_sort_state
 
     if params[:commit] == 'Refresh' #filter
       if params[:ratings] != nil
